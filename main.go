@@ -25,6 +25,8 @@ rules: %v
 }
 
 func main() {
+	printBanner()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
