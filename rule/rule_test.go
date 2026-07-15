@@ -17,7 +17,14 @@ func TestWriteMDCAndRunNames(t *testing.T) {
 	})
 	lookPath = func(string) (string, error) { return "/fake/codegraph", nil }
 	runCGInstaller = func() error { t.Fatal("installer should not run"); return nil }
-	runCGInit = func(string) error { return nil }
+	// Simulate codegraph init -i writing its own mdc before postinstall restores embed.
+	runCGInit = func(cwd string) error {
+		dir := filepath.Join(cwd, ".cursor", "rules")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+		return os.WriteFile(filepath.Join(dir, "codegraph.mdc"), []byte("rewritten-by-codegraph-init"), 0o644)
+	}
 
 	if err := RunNames([]string{"ponytail", "codegraph"}, opts); err != nil {
 		t.Fatal(err)

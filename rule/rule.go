@@ -36,8 +36,8 @@ func All() []Rule {
 		{
 			Name:        "codegraph",
 			PreInstall:  ensureCodegraphBinary,
-			Install:     func(opts Options) error { return writeMDC(opts.Cwd, "codegraph") },
-			PostInstall: initCodegraph,
+			Install:     initCodegraph, // codegraph init -i
+			PostInstall: func(opts Options) error { return writeMDC(opts.Cwd, "codegraph") },
 		},
 		{
 			Name:    "ponytail",

@@ -42,7 +42,7 @@ Keys in the TUI: `↑`/`↓` move, `space` toggle, `a` all, `enter` confirm, `q`
 
 | Rule | Hooks |
 |------|--------|
-| `codegraph` | **preinstall:** install `codegraph` binary if missing (or with `-u`); **install:** write `.cursor/rules/codegraph.mdc`; **postinstall:** `codegraph init -i` |
+| `codegraph` | **preinstall:** ensure `codegraph` binary (install if missing, or with `-u`); **install:** `codegraph init -i`; **postinstall:** write embed `.cursor/rules/codegraph.mdc` |
 | `ponytail` | **install:** write `.cursor/rules/ponytail.mdc` |
 
 ## Develop
