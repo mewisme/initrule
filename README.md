@@ -20,6 +20,19 @@ irm https://get.mewis.me/initrule.ps1 | iex
 
 Pin a version with `INITRULE_VERSION=v0.0.4`. Uninstall on Unix: `sh install.sh --uninstall`.
 
+**Scoop (Windows):**
+
+```powershell
+scoop bucket add mew https://github.com/mewisme/scoop-mew
+scoop install mew/initrule
+```
+
+Or install the release manifest directly:
+
+```powershell
+scoop install https://github.com/mewisme/initrule/releases/latest/download/initrule.json
+```
+
 **From source:**
 
 ```bash

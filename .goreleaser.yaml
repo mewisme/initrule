@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 
+project_name: initrule
+
 builds:
   - id: initrule
     main: .
@@ -36,3 +38,19 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+# Attach initrule.json to the GitHub release.
+# mewisme/scoop-mew auto-syncs that asset into bucket/initrule.json.
+# https://goreleaser.com/customization/publish/scoop/
+scoops:
+  - name: initrule
+    url_template: "https://github.com/mewisme/initrule/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    homepage: "https://github.com/mewisme/initrule"
+    description: "CLI to install Cursor rule files (.cursor/rules/*.mdc) into a project"
+    license: MIT
+    goamd64: v1
+    skip_upload: true
+    repository:
+      owner: mewisme
+      name: scoop-mew
+      branch: main
