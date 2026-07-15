@@ -39,8 +39,8 @@ changelog:
       - "^docs:"
       - "^test:"
 
-# Attach initrule.json to the GitHub release.
-# mewisme/scoop-mew auto-syncs that asset into bucket/initrule.json.
+# Attach initrule.json to the GitHub release via CI (see release.yml).
+# scoops generates the file; skip_upload skips scoop-bucket push (scoop-mew syncs the release asset).
 # https://goreleaser.com/customization/publish/scoop/
 scoops:
   - name: initrule
