@@ -6,14 +6,19 @@ Bundled rules: **codegraph**, **ponytail** (more later).
 
 ## Install
 
-**From release** (see [Releases](https://github.com/mewisme/initrule/releases)):
+**One-liner (recommended):**
 
 ```bash
-# example: Linux amd64
-curl -fsSL -o initrule.tar.gz https://github.com/mewisme/initrule/releases/latest/download/initrule_Linux_x86_64.tar.gz
-tar -xzf initrule.tar.gz
-sudo mv initrule /usr/local/bin/
+# macOS / Linux
+curl -fsSL https://get.mewis.me/initrule.sh | sh
 ```
+
+```powershell
+# Windows (PowerShell)
+irm https://get.mewis.me/initrule.ps1 | iex
+```
+
+Pin a version with `INITRULE_VERSION=v0.0.4`. Uninstall on Unix: `sh install.sh --uninstall`.
 
 **From source:**
 
