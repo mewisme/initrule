@@ -2,9 +2,9 @@ package rule
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 )
 
 // Injectable for tests.
@@ -14,9 +14,7 @@ var (
 	runCGInit      = func(cwd string) error {
 		cmd := exec.Command("codegraph", "init", "-i")
 		cmd.Dir = cwd
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		return cmd.Run()
+		return runQuiet(cmd)
 	}
 )
 
@@ -38,17 +36,29 @@ func ensureCodegraphBinary(opts Options) error {
 func installCodegraphBinary() error {
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("powershell", "-NoProfile", "-Command",
+		cmd = exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command",
 			"irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex")
 	} else {
 		cmd = exec.Command("sh", "-c",
 			"curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh")
 	}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return runQuiet(cmd)
 }
 
 func initCodegraph(opts Options) error {
 	return runCGInit(opts.Cwd)
+}
+
+// runQuiet runs cmd without inheriting the parent terminal I/O.
+// On failure, captured output is attached to the error.
+func runQuiet(cmd *exec.Cmd) error {
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		return nil
+	}
+	msg := strings.TrimSpace(string(out))
+	if msg == "" {
+		return err
+	}
+	return fmt.Errorf("%w\n%s", err, msg)
 }
