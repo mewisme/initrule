@@ -30,6 +30,14 @@ builds:
       - goos: windows
         goarch: arm
 
+# https://goreleaser.com/customization/upx/
+# darwin unsupported (Gatekeeper/Ventura+); skip if upx missing from PATH.
+upx:
+  - enabled: true
+    ids: [initrule]
+    goos: [linux, windows]
+    compress: best
+
 archives:
   - id: initrule
     formats: [tar.gz]
