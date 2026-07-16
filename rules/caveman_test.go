@@ -3,12 +3,16 @@ package rules
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
 func TestCavemanMoveAndLockCleanup(t *testing.T) {
 	dir := t.TempDir()
 	opts := Options{Cwd: dir}
+	if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte("node_modules/\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 
 	old := runCavemanAdd
 	t.Cleanup(func() { runCavemanAdd = old })
@@ -46,6 +50,30 @@ func TestCavemanMoveAndLockCleanup(t *testing.T) {
 	}
 	if string(got) != string(want) {
 		t.Fatal("caveman.mdc mismatch")
+	}
+	gi, err := os.ReadFile(filepath.Join(dir, ".gitignore"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, line := range strings.Split(string(gi), "\n") {
+		if strings.TrimSpace(line) == caveGitignore {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("gitignore missing %q: %s", caveGitignore, gi)
+	}
+}
+
+func TestEnsureGitignoreCaveSkipMissing(t *testing.T) {
+	dir := t.TempDir()
+	if err := ensureGitignoreCave(dir); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".gitignore")); !os.IsNotExist(err) {
+		t.Fatal("should not create .gitignore")
 	}
 }
 

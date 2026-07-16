@@ -5,7 +5,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
+
+const caveGitignore = ".cursor/skills/cave*"
 
 // Injectable for tests.
 var runCavemanAdd = func(cwd string) error {
@@ -67,7 +70,7 @@ func caveman() Rule {
 					if !hadLock {
 						_ = os.Remove(filepath.Join(opts.Cwd, "skills-lock.json"))
 					}
-					return nil
+					return ensureGitignoreCave(opts.Cwd)
 				},
 			},
 			{
@@ -133,4 +136,27 @@ func pruneEmptyAgents(cwd string) error {
 func emptyDir(dir string) bool {
 	entries, err := os.ReadDir(dir)
 	return err == nil && len(entries) == 0
+}
+
+// ensureGitignoreCave appends .cursor/skills/cave* when .gitignore exists and lacks it.
+func ensureGitignoreCave(cwd string) error {
+	p := filepath.Join(cwd, ".gitignore")
+	b, err := os.ReadFile(p)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		if strings.TrimSpace(line) == caveGitignore {
+			return nil
+		}
+	}
+	out := string(b)
+	if len(out) > 0 && !strings.HasSuffix(out, "\n") {
+		out += "\n"
+	}
+	out += caveGitignore + "\n"
+	return os.WriteFile(p, []byte(out), 0o644)
 }
