@@ -44,14 +44,41 @@ checksum:
   name_template: checksums.txt
 
 snapshot:
-  version_template: "{{ .Tag }}-next"
+  version_template: "{{ .Version }}-next"
 
 changelog:
+  use: github
   sort: asc
+  abbrev: -1
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Performance
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Refactor
+      regexp: '^.*?refactor(\([[:word:]]+\))??!?:.+$'
+      order: 3
+    - title: Build
+      regexp: '^.*?(build|ci)(\([[:word:]]+\))??!?:.+$'
+      order: 4
+    - title: Documentation
+      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
+      order: 5
+    - title: Others
+      order: 999
   filters:
     exclude:
-      - "^docs:"
       - "^test:"
+      - "^chore:"
+      - "^style:"
+      - "^revert:"
+      - "^Merge pull request"
+      - "^Merge branch"
 
 # Attach initrule.json to the GitHub release via CI (see release.yml).
 # scoops generates the file; skip_upload skips scoop-bucket push (scoop-mew syncs the release asset).

@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # skip_upload skips scoop/homebrew publish; attach manifests for tap sync.
+      # skip_upload: attach package manifests for scoop/homebrew sync.
       - name: Attach package manifests
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
