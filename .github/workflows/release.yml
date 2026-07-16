@@ -28,10 +28,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # skip_upload skips scoop publish; ensure initrule.json is on the release for scoop-mew.
-      - name: Attach Scoop manifest
+      # skip_upload skips scoop/homebrew publish; attach manifests for tap sync.
+      - name: Attach package manifests
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           test -f dist/scoop/initrule.json
-          gh release upload "${GITHUB_REF_NAME}" dist/scoop/initrule.json --clobber
+          test -f dist/homebrew/Casks/initrule.rb
+          gh release upload "${GITHUB_REF_NAME}" \
+            dist/scoop/initrule.json \
+            dist/homebrew/Casks/initrule.rb \
+            --clobber

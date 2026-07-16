@@ -18,7 +18,8 @@ builds:
       - arm64
 
 archives:
-  - formats: [tar.gz]
+  - id: initrule
+    formats: [tar.gz]
     files:
       - LICENSE
       - README.md
@@ -53,4 +54,29 @@ scoops:
     repository:
       owner: mewisme
       name: scoop-mew
+      branch: main
+
+# Attach initrule.rb to the GitHub release via CI (see release.yml).
+# homebrew_casks generates the file; skip_upload skips tap push (homebrew-tools syncs the release asset).
+# https://goreleaser.com/customization/publish/homebrew_casks/
+homebrew_casks:
+  - name: initrule
+    ids:
+      - initrule
+    binaries:
+      - initrule
+    homepage: "https://github.com/mewisme/initrule"
+    description: "CLI to install Cursor rule files (.cursor/rules/*.mdc) into a project"
+    directory: Casks
+    skip_upload: true
+    hooks:
+      post:
+        # Unsigned binary — clear quarantine so macOS Gatekeeper does not block it.
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/initrule"]
+          end
+    repository:
+      owner: mewisme
+      name: homebrew-tools
       branch: main

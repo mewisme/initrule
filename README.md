@@ -33,6 +33,13 @@ Or install the release manifest directly:
 scoop install https://github.com/mewisme/initrule/releases/latest/download/initrule.json
 ```
 
+**Homebrew (macOS / Linux):**
+
+```bash
+brew tap mewisme/tools
+brew install --cask initrule
+```
+
 **From source:**
 
 ```bash
