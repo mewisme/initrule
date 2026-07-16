@@ -16,6 +16,19 @@ builds:
     goarch:
       - amd64
       - arm64
+      - "386"
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      # macOS dropped 32-bit long ago
+      - goos: darwin
+        goarch: "386"
+      - goos: darwin
+        goarch: arm
+      # Windows 32-bit ARM is effectively unused
+      - goos: windows
+        goarch: arm
 
 archives:
   - id: initrule

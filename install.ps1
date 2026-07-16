@@ -10,7 +10,12 @@ $ErrorActionPreference = 'Stop'
 $repo = 'mewisme/initrule'
 $installDir = if ($env:INITRULE_INSTALL_DIR) { $env:INITRULE_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'initrule' }
 
-$arch = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq 'Arm64') { 'arm64' } else { 'amd64' }
+$arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
+  'Arm64' { 'arm64' }
+  'X64' { 'amd64' }
+  'X86' { '386' }
+  default { throw "initrule: unsupported architecture '$_'." }
+}
 
 $version = $env:INITRULE_VERSION
 if (-not $version) {

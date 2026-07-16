@@ -33,8 +33,15 @@ esac
 case "$arch" in
 	arm64|aarch64) arch="arm64" ;;
 	x86_64|amd64) arch="amd64" ;;
+	i386|i686|x86) arch="386" ;;
+	# GoReleaser archive name for GOARCH=arm GOARM=7
+	armv7l|armv7) arch="armv7" ;;
 	*) echo "initrule: unsupported architecture '$arch'." >&2; exit 1 ;;
 esac
+if [ "$os" = "darwin" ] && { [ "$arch" = "386" ] || [ "$arch" = "armv7" ]; }; then
+	echo "initrule: unsupported architecture '$arch' on darwin." >&2
+	exit 1
+fi
 
 version="${INITRULE_VERSION:-}"
 if [ -z "$version" ]; then
