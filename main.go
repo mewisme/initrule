@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mewisme/initrule/rule"
+	"github.com/mewisme/initrule/rules"
 	"github.com/mewisme/initrule/tui"
 )
 
@@ -21,7 +21,7 @@ flags (with install|i):
   -u, --update   force codegraph binary reinstall
 
 rules: %v
-`, rule.Names())
+`, rules.Names())
 }
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	opts := rule.Options{Cwd: cwd}
+	opts := rules.Options{Cwd: cwd}
 
 	if len(os.Args) == 1 {
 		if err := tui.Run(opts); err != nil {
@@ -71,9 +71,9 @@ func main() {
 	}
 
 	if all {
-		err = rule.RunAll(opts)
+		err = rules.RunAll(opts)
 	} else {
-		err = rule.RunNames(names, opts)
+		err = rules.RunNames(names, opts)
 	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

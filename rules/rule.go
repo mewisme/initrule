@@ -1,4 +1,4 @@
-package rule
+package rules
 
 import (
 	"fmt"
@@ -64,6 +64,7 @@ func All() []Rule {
 				}},
 			},
 		},
+		caveman(),
 	}
 }
 

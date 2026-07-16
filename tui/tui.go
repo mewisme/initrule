@@ -6,7 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/mewisme/initrule/rule"
+	"github.com/mewisme/initrule/rules"
 )
 
 var (
@@ -103,8 +103,8 @@ func (m model) chosen() []string {
 }
 
 // Run shows multi-select; on confirm runs selected rules. Returns nil on quit with no selection.
-func Run(opts rule.Options) error {
-	p := tea.NewProgram(newModel(rule.Names()))
+func Run(opts rules.Options) error {
+	p := tea.NewProgram(newModel(rules.Names()))
 	final, err := p.Run()
 	if err != nil {
 		return err
@@ -118,5 +118,5 @@ func Run(opts rule.Options) error {
 		fmt.Println("nothing selected")
 		return nil
 	}
-	return rule.RunNames(names, opts)
+	return rules.RunNames(names, opts)
 }
