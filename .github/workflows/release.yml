@@ -42,3 +42,17 @@ jobs:
             dist/scoop/initrule.json \
             dist/homebrew/Casks/initrule.rb \
             --clobber
+
+      # Cross-repo: needs PAT with contents:write (or workflow) on homebrew-mew + scoop-mew.
+      - name: Trigger package manager sync
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGE_SYNC_TOKEN }}
+        run: |
+          payload=$(jq -n \
+            --arg name "initrule" \
+            --arg tag "${GITHUB_REF_NAME}" \
+            '{event_type:"sync-package",client_payload:{name:$name,tag:$tag}}')
+          for repo in homebrew-mew scoop-mew; do
+            echo "$payload" | gh api "repos/${{ github.repository_owner }}/${repo}/dispatches" --input -
+            echo "Dispatched sync-package to ${{ github.repository_owner }}/${repo} (${GITHUB_REF_NAME})"
+          done
