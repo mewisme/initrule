@@ -1,36 +1,36 @@
-# initrule installer for Windows (PowerShell).
+# agentrule installer for Windows (PowerShell).
 #
-# irm https://raw.githubusercontent.com/mewisme/initrule/main/install.ps1 | iex
+# irm https://raw.githubusercontent.com/mewisme/agentrule/main/install.ps1 | iex
 #
 # Environment:
-#   INITRULE_VERSION      release tag (default: latest)
-#   INITRULE_INSTALL_DIR  install location (default: %LOCALAPPDATA%\initrule)
+#   AGENTRULE_VERSION      release tag (default: latest)
+#   AGENTRULE_INSTALL_DIR  install location (default: %LOCALAPPDATA%\agentrule)
 
 $ErrorActionPreference = 'Stop'
-$repo = 'mewisme/initrule'
-$installDir = if ($env:INITRULE_INSTALL_DIR) { $env:INITRULE_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'initrule' }
+$repo = 'mewisme/agentrule'
+$installDir = if ($env:AGENTRULE_INSTALL_DIR) { $env:AGENTRULE_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'agentrule' }
 
 $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
   'Arm64' { 'arm64' }
   'X64' { 'amd64' }
   'X86' { '386' }
-  default { throw "initrule: unsupported architecture '$_'." }
+  default { throw "agentrule: unsupported architecture '$_'." }
 }
 
-$version = $env:INITRULE_VERSION
+$version = $env:AGENTRULE_VERSION
 if (-not $version) {
   $version = (Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest").tag_name
 }
-if (-not $version) { throw "initrule: could not resolve latest version; set INITRULE_VERSION." }
+if (-not $version) { throw "agentrule: could not resolve latest version; set AGENTRULE_VERSION." }
 if ($version -notmatch '^v') { $version = "v$version" }
 $ver = $version.TrimStart('v')
 
-$url = "https://github.com/$repo/releases/download/$version/initrule_${ver}_windows_${arch}.zip"
-Write-Host "Installing initrule $version (windows/$arch)..."
+$url = "https://github.com/$repo/releases/download/$version/agentrule_${ver}_windows_${arch}.zip"
+Write-Host "Installing agentrule $version (windows/$arch)..."
 
-$tmp = Join-Path $env:TEMP ("initrule-" + [guid]::NewGuid().ToString())
+$tmp = Join-Path $env:TEMP ("agentrule-" + [guid]::NewGuid().ToString())
 New-Item -ItemType Directory -Force -Path $tmp | Out-Null
-$zip = Join-Path $tmp 'initrule.zip'
+$zip = Join-Path $tmp 'agentrule.zip'
 Invoke-WebRequest -Uri $url -OutFile $zip
 
 $dest = Join-Path $installDir 'current'
@@ -39,10 +39,10 @@ New-Item -ItemType Directory -Force -Path $dest | Out-Null
 Expand-Archive -Path $zip -DestinationPath $dest -Force
 Remove-Item -Recurse -Force $tmp
 
-$exe = Join-Path $dest 'initrule.exe'
-if (-not (Test-Path $exe)) { throw "initrule: initrule.exe missing from archive." }
+$exe = Join-Path $dest 'agentrule.exe'
+if (-not (Test-Path $exe)) { throw "agentrule: agentrule.exe missing from archive." }
 
-$defaultInstall = Join-Path $env:LOCALAPPDATA 'initrule'
+$defaultInstall = Join-Path $env:LOCALAPPDATA 'agentrule'
 # Only mutate user PATH for the default install location.
 if ($installDir -eq $defaultInstall) {
   $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -54,4 +54,4 @@ if ($installDir -eq $defaultInstall) {
 }
 
 Write-Host "Installed to $dest"
-Write-Host "Run: initrule --help"
+Write-Host "Run: agentrule --help"

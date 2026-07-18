@@ -1,4 +1,6 @@
 # Binaries / build
+/agentrule
+/agentrule.exe
 /initrule
 /initrule.exe
 /dist/

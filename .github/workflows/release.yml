@@ -36,11 +36,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          test -f dist/scoop/initrule.json
-          test -f dist/homebrew/Casks/initrule.rb
+          test -f dist/scoop/agentrule.json
+          test -f dist/homebrew/Casks/agentrule.rb
           gh release upload "${GITHUB_REF_NAME}" \
-            dist/scoop/initrule.json \
-            dist/homebrew/Casks/initrule.rb \
+            dist/scoop/agentrule.json \
+            dist/homebrew/Casks/agentrule.rb \
             --clobber
 
       # Cross-repo: needs PAT with contents:write (or workflow) on homebrew-mew + scoop-mew.
@@ -49,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PACKAGE_SYNC_TOKEN }}
         run: |
           payload=$(jq -n \
-            --arg name "initrule" \
+            --arg name "agentrule" \
             --arg tag "${GITHUB_REF_NAME}" \
             '{event_type:"sync-package",client_payload:{name:$name,tag:$tag}}')
           for repo in homebrew-mew scoop-mew; do

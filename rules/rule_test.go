@@ -1,29 +1,34 @@
 package rules
 
 import (
+	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-func TestWriteMDCAndRunNames(t *testing.T) {
+func TestWriteRuleAndRunNames(t *testing.T) {
 	dir := t.TempDir()
-	opts := Options{Cwd: dir}
+	// Seed .cursor so auto-detect picks cursor.
+	if err := os.MkdirAll(filepath.Join(dir, ".cursor"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	opts := Options{Cwd: dir, Target: "cursor", Location: "local"}
 
-	// Stub codegraph hooks so we don't touch the real binary.
-	oldLook, oldInst, oldInit := lookPath, runCGInstaller, runCGInit
+	oldLook, oldInst, oldAgents, oldInit := lookPath, runCGInstaller, runCGAgents, runCGInit
 	t.Cleanup(func() {
-		lookPath, runCGInstaller, runCGInit = oldLook, oldInst, oldInit
+		lookPath, runCGInstaller, runCGAgents, runCGInit = oldLook, oldInst, oldAgents, oldInit
 	})
 	lookPath = func(string) (string, error) { return "/fake/codegraph", nil }
-	runCGInstaller = func() error { t.Fatal("installer should not run"); return nil }
-	// Simulate codegraph init -i writing its own mdc before postinstall restores embed.
-	runCGInit = func(cwd string) error {
-		dir := filepath.Join(cwd, ".cursor", "rules")
-		if err := os.MkdirAll(dir, 0o755); err != nil {
+	runCGInstaller = func(context.Context) error { t.Fatal("installer should not run"); return nil }
+	runCGAgents = func(context.Context, Options) error { return nil }
+	runCGInit = func(ctx context.Context, cwd string) error {
+		d := filepath.Join(cwd, ".cursor", "rules")
+		if err := os.MkdirAll(d, 0o755); err != nil {
 			return err
 		}
-		return os.WriteFile(filepath.Join(dir, "codegraph.mdc"), []byte("rewritten-by-codegraph-init"), 0o644)
+		return os.WriteFile(filepath.Join(d, "codegraph.mdc"), []byte("rewritten-by-codegraph-init"), 0o644)
 	}
 
 	if err := RunNames([]string{"ponytail", "codegraph"}, opts); err != nil {
@@ -43,6 +48,37 @@ func TestWriteMDCAndRunNames(t *testing.T) {
 		if string(b) != string(want) {
 			t.Fatalf("%s: content mismatch", name)
 		}
+	}
+}
+
+func TestWriteRuleClaude(t *testing.T) {
+	dir := t.TempDir()
+	opts := Options{Cwd: dir, Target: "claude,cursor", Location: "local"}
+	if err := writeRule(opts, "ponytail"); err != nil {
+		t.Fatal(err)
+	}
+	b, err := os.ReadFile(filepath.Join(dir, ".claude", "CLAUDE.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(b), "<!-- PONYTAIL_START -->") {
+		t.Fatal("missing ponytail block")
+	}
+	if strings.Contains(string(b), "alwaysApply:") {
+		t.Fatal("frontmatter leaked into CLAUDE.md")
+	}
+}
+
+func TestEmbedFromRewrite(t *testing.T) {
+	b, err := content("codegraph")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(b), "codegraph_explore") {
+		t.Fatal("expected explore-only rewrite")
+	}
+	if strings.Contains(string(b), "codegraph_search") {
+		t.Fatal("stale multi-tool docs still embedded")
 	}
 }
 

@@ -1,25 +1,25 @@
 #!/bin/sh
 #
-# initrule installer (macOS / Linux).
+# agentrule installer (macOS / Linux).
 #
-# curl -fsSL https://raw.githubusercontent.com/mewisme/initrule/main/install.sh | sh
+# curl -fsSL https://raw.githubusercontent.com/mewisme/agentrule/main/install.sh | sh
 #
 # Uninstall: curl -fsSL .../install.sh | sh -s -- --uninstall
 #
 # Environment:
-#   INITRULE_VERSION     release tag (default: latest)
-#   INITRULE_INSTALL_DIR bundle location (default: ~/.initrule)
-#   INITRULE_BIN_DIR     symlink location (default: ~/.local/bin)
+#   AGENTRULE_VERSION     release tag (default: latest)
+#   AGENTRULE_INSTALL_DIR bundle location (default: ~/.agentrule)
+#   AGENTRULE_BIN_DIR     symlink location (default: ~/.local/bin)
 set -eu
 
-REPO="mewisme/initrule"
-INSTALL_DIR="${INITRULE_INSTALL_DIR:-$HOME/.initrule}"
-BIN_DIR="${INITRULE_BIN_DIR:-$HOME/.local/bin}"
+REPO="mewisme/agentrule"
+INSTALL_DIR="${AGENTRULE_INSTALL_DIR:-$HOME/.agentrule}"
+BIN_DIR="${AGENTRULE_BIN_DIR:-$HOME/.local/bin}"
 
 if [ "${1:-}" = "--uninstall" ]; then
-	rm -f "$BIN_DIR/initrule"
+	rm -f "$BIN_DIR/agentrule"
 	rm -rf "$INSTALL_DIR"
-	echo "initrule uninstalled (removed $INSTALL_DIR and $BIN_DIR/initrule)."
+	echo "agentrule uninstalled (removed $INSTALL_DIR and $BIN_DIR/agentrule)."
 	exit 0
 fi
 
@@ -28,7 +28,7 @@ arch="$(uname -m)"
 case "$os" in
 	Darwin) os="darwin" ;;
 	Linux) os="linux" ;;
-	*) echo "initrule: unsupported OS '$os'." >&2; exit 1 ;;
+	*) echo "agentrule: unsupported OS '$os'." >&2; exit 1 ;;
 esac
 case "$arch" in
 	arm64|aarch64) arch="arm64" ;;
@@ -36,14 +36,14 @@ case "$arch" in
 	i386|i686|x86) arch="386" ;;
 	# GoReleaser archive name for GOARCH=arm GOARM=7
 	armv7l|armv7) arch="armv7" ;;
-	*) echo "initrule: unsupported architecture '$arch'." >&2; exit 1 ;;
+	*) echo "agentrule: unsupported architecture '$arch'." >&2; exit 1 ;;
 esac
 if [ "$os" = "darwin" ] && { [ "$arch" = "386" ] || [ "$arch" = "armv7" ]; }; then
-	echo "initrule: unsupported architecture '$arch' on darwin." >&2
+	echo "agentrule: unsupported architecture '$arch' on darwin." >&2
 	exit 1
 fi
 
-version="${INITRULE_VERSION:-}"
+version="${AGENTRULE_VERSION:-}"
 if [ -z "$version" ]; then
 	version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" \
 		| sed -n 's#.*/releases/tag/##p')"
@@ -53,29 +53,29 @@ if [ -z "$version" ]; then
 		| sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n1)"
 fi
 [ -n "$version" ] || {
-	echo "initrule: could not resolve latest version; set INITRULE_VERSION (e.g. INITRULE_VERSION=v0.0.4)." >&2
+	echo "agentrule: could not resolve latest version; set AGENTRULE_VERSION (e.g. AGENTRULE_VERSION=v0.1.0)." >&2
 	exit 1
 }
 case "$version" in v*) ;; *) version="v$version" ;; esac
 ver="${version#v}"
 
-url="https://github.com/$REPO/releases/download/$version/initrule_${ver}_${os}_${arch}.tar.gz"
-echo "Installing initrule $version ($os/$arch)..."
+url="https://github.com/$REPO/releases/download/$version/agentrule_${ver}_${os}_${arch}.tar.gz"
+echo "Installing agentrule $version ($os/$arch)..."
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-curl -fsSL "$url" -o "$tmp/initrule.tar.gz" || {
-	echo "initrule: download failed: $url" >&2
+curl -fsSL "$url" -o "$tmp/agentrule.tar.gz" || {
+	echo "agentrule: download failed: $url" >&2
 	exit 1
 }
 
 dest="$INSTALL_DIR/versions/$version"
 rm -rf "$dest"
 mkdir -p "$dest"
-tar -xzf "$tmp/initrule.tar.gz" -C "$dest"
-chmod +x "$dest/initrule"
+tar -xzf "$tmp/agentrule.tar.gz" -C "$dest"
+chmod +x "$dest/agentrule"
 
 mkdir -p "$BIN_DIR"
-ln -sf "$dest/initrule" "$BIN_DIR/initrule"
+ln -sf "$dest/agentrule" "$BIN_DIR/agentrule"
 ln -sfn "$dest" "$INSTALL_DIR/current"
 
 # Prune older versions.
@@ -87,7 +87,7 @@ if [ -d "$INSTALL_DIR/versions" ]; then
 fi
 
 echo "Installed to $dest"
-echo "Linked $BIN_DIR/initrule"
+echo "Linked $BIN_DIR/agentrule"
 
 on_path=0
 oldifs="$IFS"
@@ -104,4 +104,4 @@ if [ "$on_path" -eq 0 ]; then
 fi
 
 echo ""
-echo "Done. Run: initrule --help"
+echo "Done. Run: agentrule --help"

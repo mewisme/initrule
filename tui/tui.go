@@ -1,122 +1,48 @@
 package tui
 
 import (
+	"errors"
 	"fmt"
-	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/mewisme/initrule/rules"
+	tea "charm.land/bubbletea/v2"
+	"github.com/mewisme/agentrule/rules"
 )
 
-var (
-	titleStyle  = lipgloss.NewStyle().Bold(true)
-	cursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("12"))
-	helpStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
-)
+// ErrCanceled is returned from Run when the user cancels during installation.
+var ErrCanceled = errors.New("installation canceled")
 
-type model struct {
-	names     []string
-	cursor    int
-	selected  map[int]bool
-	quitting  bool
-	confirmed bool
-}
-
-func newModel(names []string) model {
-	return model{
-		names:    names,
-		selected: map[int]bool{},
-	}
-}
-
-func (m model) Init() tea.Cmd { return nil }
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q", "esc":
-			m.quitting = true
-			return m, tea.Quit
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down", "j":
-			if m.cursor < len(m.names)-1 {
-				m.cursor++
-			}
-		case " ":
-			m.selected[m.cursor] = !m.selected[m.cursor]
-		case "a":
-			allOn := true
-			for i := range m.names {
-				if !m.selected[i] {
-					allOn = false
-					break
-				}
-			}
-			for i := range m.names {
-				m.selected[i] = !allOn
-			}
-		case "enter":
-			m.confirmed = true
-			return m, tea.Quit
-		}
-	}
-	return m, nil
-}
-
-func (m model) View() string {
-	if m.quitting || m.confirmed {
-		return ""
-	}
-	var b strings.Builder
-	b.WriteString(titleStyle.Render("Select rules to install"))
-	b.WriteString("\n\n")
-	for i, name := range m.names {
-		cursor := " "
-		if m.cursor == i {
-			cursor = cursorStyle.Render(">")
-		}
-		check := "[ ]"
-		if m.selected[i] {
-			check = "[x]"
-		}
-		fmt.Fprintf(&b, "%s %s %s\n", cursor, check, name)
-	}
-	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("space toggle · a all · enter confirm · q quit"))
-	b.WriteString("\n")
-	return b.String()
-}
-
-func (m model) chosen() []string {
-	var out []string
-	for i, name := range m.names {
-		if m.selected[i] {
-			out = append(out, name)
-		}
-	}
-	return out
-}
-
-// Run shows multi-select; on confirm runs selected rules. Returns nil on quit with no selection.
+// Run shows the wizard and runs installation inside Bubble Tea.
+// On success or failure, exits automatically and reprints the timeline to the
+// normal console so it remains after the alt-screen closes.
+// Returns nil on success or quit-before-install; ErrCanceled on cancel;
+// installErr on failure.
 func Run(opts rules.Options) error {
-	p := tea.NewProgram(newModel(rules.Names()))
+	p := tea.NewProgram(newModel(opts))
 	final, err := p.Run()
 	if err != nil {
 		return err
 	}
-	m := final.(model)
-	if m.quitting || !m.confirmed {
+	m, ok := final.(model)
+	if !ok {
 		return nil
 	}
-	names := m.chosen()
-	if len(names) == 0 {
-		fmt.Println("nothing selected")
+
+	if m.canceled {
+		return ErrCanceled
+	}
+	if m.step == stepFailed {
+		fmt.Print(m.failedView())
+		return m.installErr
+	}
+	if m.quitting && m.step < stepInstall {
 		return nil
 	}
-	return rules.RunNames(names, opts)
+	if m.step == stepDone {
+		fmt.Print(m.doneView())
+		return nil
+	}
+	if m.installErr != nil {
+		return m.installErr
+	}
+	return nil
 }
