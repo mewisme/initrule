@@ -2,7 +2,7 @@
 
 CLI to install Cursor rule files (`.cursor/rules/*.mdc`) into a project. Interactive Bubble Tea multi-select, or fast non-interactive install.
 
-Bundled rules: **codegraph**, **ponytail**, **caveman** (more later).
+Bundled rules: **codegraph**, **ponytail** (more later).
 
 ## Install
 
@@ -69,7 +69,6 @@ Keys in the TUI: `↑`/`↓` move, `space` toggle, `a` all, `enter` confirm, `q`
 |------|--------|
 | `codegraph` | **preinstall:** ensure `codegraph` binary (install if missing, or with `-u`); **install:** `codegraph init -i`; **postinstall:** write embed `.cursor/rules/codegraph.mdc` |
 | `ponytail` | **install:** write `.cursor/rules/ponytail.mdc` |
-| `caveman` | **install:** `npx skills add …` and detect new skill dirs; **postinstall:** move only those → `.cursor/skills`, prune empty `.agents`, write embed `.cursor/rules/caveman.mdc` |
 
 ## Develop
 

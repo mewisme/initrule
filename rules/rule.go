@@ -64,7 +64,6 @@ func All() []Rule {
 				}},
 			},
 		},
-		caveman(),
 	}
 }
 
