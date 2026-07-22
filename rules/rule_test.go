@@ -80,6 +80,14 @@ func TestEmbedFromRewrite(t *testing.T) {
 	if strings.Contains(string(b), "codegraph_search") {
 		t.Fatal("stale multi-tool docs still embedded")
 	}
+
+	adhd, err := content("i-have-adhd")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(adhd), "Lead with the next action") {
+		t.Fatal("expected i-have-adhd rewrite")
+	}
 }
 
 func TestUnknownRule(t *testing.T) {
@@ -92,6 +100,9 @@ func TestUnknownRule(t *testing.T) {
 func TestByName(t *testing.T) {
 	if _, ok := ByName("ponytail"); !ok {
 		t.Fatal("ponytail missing")
+	}
+	if _, ok := ByName("i-have-adhd"); !ok {
+		t.Fatal("i-have-adhd missing")
 	}
 	if _, ok := ByName("missing"); ok {
 		t.Fatal("expected miss")

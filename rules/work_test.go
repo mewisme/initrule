@@ -19,6 +19,19 @@ func TestWorkItemsPonytail(t *testing.T) {
 	}
 }
 
+func TestWorkItemsIHaveADHD(t *testing.T) {
+	items, err := WorkItems([]string{"i-have-adhd"}, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("len=%d want 1", len(items))
+	}
+	if items[0].Rule != "i-have-adhd" || items[0].Key != "install" {
+		t.Fatalf("got %+v", items[0])
+	}
+}
+
 func TestWorkItemsCodegraphOrder(t *testing.T) {
 	items, err := WorkItems([]string{"codegraph"}, Options{})
 	if err != nil {

@@ -97,6 +97,12 @@ func All() []Rule {
 				{Key: "install", Label: "Wrote rule to agent targets", Run: writeRuleWork("ponytail")},
 			},
 		},
+		{
+			Name: "i-have-adhd",
+			Steps: []Step{
+				{Key: "install", Label: "Wrote rule to agent targets", Run: writeRuleWork("i-have-adhd")},
+			},
+		},
 	}
 }
 
