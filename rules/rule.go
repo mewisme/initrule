@@ -3,6 +3,7 @@ package rules
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 
 	"charm.land/lipgloss/v2"
@@ -44,6 +45,8 @@ var (
 	okStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
 	errStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
 	titleStyle = lipgloss.NewStyle().Bold(true)
+
+	goos = runtime.GOOS // injectable for tests
 )
 
 func writeRule(opts Options, name string) error {
@@ -81,7 +84,7 @@ func writeRule(opts Options, name string) error {
 
 // All is the registered rule list (append new rules here).
 func All() []Rule {
-	return []Rule{
+	out := []Rule{
 		{
 			Name: "codegraph",
 			Steps: []Step{
@@ -104,6 +107,15 @@ func All() []Rule {
 			},
 		},
 	}
+	if goos == "windows" {
+		out = append(out, Rule{
+			Name: "powershell",
+			Steps: []Step{
+				{Key: "install", Label: "Wrote rule to agent targets", Run: writeRuleWork("powershell")},
+			},
+		})
+	}
+	return out
 }
 
 func ByName(name string) (Rule, bool) {

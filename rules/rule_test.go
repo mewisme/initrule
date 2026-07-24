@@ -88,6 +88,14 @@ func TestEmbedFromRewrite(t *testing.T) {
 	if !strings.Contains(string(adhd), "Lead with the next action") {
 		t.Fatal("expected i-have-adhd rewrite")
 	}
+
+	ps, err := content("powershell")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(ps), "Never `&&` or `||`") {
+		t.Fatal("expected powershell rewrite")
+	}
 }
 
 func TestUnknownRule(t *testing.T) {
@@ -104,6 +112,14 @@ func TestByName(t *testing.T) {
 	if _, ok := ByName("i-have-adhd"); !ok {
 		t.Fatal("i-have-adhd missing")
 	}
+
+	old := goos
+	goos = "windows"
+	t.Cleanup(func() { goos = old })
+	if _, ok := ByName("powershell"); !ok {
+		t.Fatal("powershell missing on windows")
+	}
+
 	if _, ok := ByName("missing"); ok {
 		t.Fatal("expected miss")
 	}

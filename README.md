@@ -4,7 +4,7 @@ CLI to install agent instruction rules into a project (or globally). Interactive
 
 Writes rules to the agents you use — **Cursor**, **Claude Code**, **Codex CLI**, **opencode**, **Hermes**, **Gemini CLI**, **Antigravity**, **Kiro** — via `--target` / `--location`, same idea as [CodeGraph](https://github.com/colbymchenry/codegraph)'s installer.
 
-Bundled rules (embedded from [`rules/rewrite/`](rules/rewrite/)): **codegraph**, **ponytail** ([DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)), **i-have-adhd** ([ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)).
+Bundled rules (embedded from [`rules/rewrite/`](rules/rewrite/)): **codegraph**, **ponytail** ([DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)), **i-have-adhd** ([ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)), **powershell** (Windows only).
 
 ## Install
 
@@ -112,6 +112,7 @@ Codex, Hermes, and Antigravity are **global-only** (skipped when `--location=loc
 | `codegraph` | ensure binary → `codegraph install` (MCP) → `codegraph init` → write rule to agents | remove rule from agents → `codegraph uninstall --keep-cli` (leaves `.codegraph/` index and the CLI binary) |
 | `ponytail` | write rule to agents | remove rule from agents |
 | `i-have-adhd` | write rule to agents | remove rule from agents |
+| `powershell` | write rule to agents (Windows only; hidden on other OS) | remove rule from agents |
 
 ### Where rules land
 

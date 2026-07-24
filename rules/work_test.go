@@ -32,6 +32,38 @@ func TestWorkItemsIHaveADHD(t *testing.T) {
 	}
 }
 
+func TestWorkItemsPowershell(t *testing.T) {
+	old := goos
+	goos = "windows"
+	t.Cleanup(func() { goos = old })
+
+	items, err := WorkItems([]string{"powershell"}, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("len=%d want 1", len(items))
+	}
+	if items[0].Rule != "powershell" || items[0].Key != "install" {
+		t.Fatalf("got %+v", items[0])
+	}
+}
+
+func TestNamesOmitsPowershellOffWindows(t *testing.T) {
+	old := goos
+	goos = "linux"
+	t.Cleanup(func() { goos = old })
+
+	for _, n := range Names() {
+		if n == "powershell" {
+			t.Fatal("powershell listed on non-windows")
+		}
+	}
+	if _, ok := ByName("powershell"); ok {
+		t.Fatal("powershell ByName on non-windows")
+	}
+}
+
 func TestWorkItemsCodegraphOrder(t *testing.T) {
 	items, err := WorkItems([]string{"codegraph"}, Options{})
 	if err != nil {
