@@ -56,8 +56,12 @@ func pipeLine() string { return dimStyle.Render("│") }
 
 func (m model) timelineHeader() string {
 	var b strings.Builder
-	b.WriteString(dimStyle.Render("┌") + "  " + titleStyle.Render("Installing rules") + "\n")
-	b.WriteString(pipeLine() + "\n")
+	b.WriteString(dimStyle.Render("┌"))
+	b.WriteString("  ")
+	b.WriteString(titleStyle.Render("Installing rules"))
+	b.WriteString("\n")
+	b.WriteString(pipeLine())
+	b.WriteString("\n")
 	loc := m.opts.Location
 	if loc == "" {
 		loc = "local"
@@ -66,9 +70,13 @@ func (m model) timelineHeader() string {
 	if tgt == "" {
 		tgt = "auto"
 	}
-	b.WriteString(okStyle.Render("◆") + "  Initialized in " + m.opts.Cwd + "\n")
+	b.WriteString(okStyle.Render("◆"))
+	b.WriteString("  Initialized in ")
+	b.WriteString(m.opts.Cwd)
+	b.WriteString("\n")
 	b.WriteString(fmt.Sprintf("%s  Agents: %s · location: %s\n", pipeLine(), tgt, loc))
-	b.WriteString(pipeLine() + "\n")
+	b.WriteString(pipeLine())
+	b.WriteString("\n")
 	return b.String()
 }
 
@@ -77,14 +85,26 @@ func writeTimelineLines(b *strings.Builder, lines []completedLine) (lastRule str
 	for _, line := range lines {
 		if line.rule != lastRule {
 			if lastRule != "" {
-				b.WriteString(pipeLine() + "\n")
+				b.WriteString(pipeLine())
+				b.WriteString("\n")
 			}
 			lastRule = line.rule
-			b.WriteString(okStyle.Render("◆") + "  " + line.rule + "\n")
+			b.WriteString(okStyle.Render("◆"))
+			b.WriteString("  ")
+			b.WriteString(line.rule)
+			b.WriteString("\n")
 		}
-		b.WriteString(pipeLine() + "  " + okStyle.Render("*") + " " + line.label + "\n")
+		b.WriteString(pipeLine())
+		b.WriteString("  ")
+		b.WriteString(okStyle.Render("*"))
+		b.WriteString(" ")
+		b.WriteString(line.label)
+		b.WriteString("\n")
 		if line.detail != "" {
-			b.WriteString(pipeLine() + "  " + dimStyle.Render(line.detail) + "\n")
+			b.WriteString(pipeLine())
+			b.WriteString("  ")
+			b.WriteString(dimStyle.Render(line.detail))
+			b.WriteString("\n")
 		}
 	}
 	return lastRule
@@ -99,11 +119,20 @@ func (m model) installView() string {
 		cur := m.work[m.workIndex]
 		if cur.Rule != lastRule {
 			if lastRule != "" {
-				b.WriteString(pipeLine() + "\n")
+				b.WriteString(pipeLine())
+				b.WriteString("\n")
 			}
-			b.WriteString(okStyle.Render("◆") + "  " + cur.Rule + "\n")
+			b.WriteString(okStyle.Render("◆"))
+			b.WriteString("  ")
+			b.WriteString(cur.Rule)
+			b.WriteString("\n")
 		}
-		b.WriteString(fmt.Sprintf("%s  %s %s\n", pipeLine(), m.spinner.View(), cur.Label))
+		b.WriteString(pipeLine())
+		b.WriteString("  ")
+		b.WriteString(m.spinner.View())
+		b.WriteString(" ")
+		b.WriteString(cur.Label)
+		b.WriteString("\n")
 	}
 	return b.String()
 }
@@ -113,9 +142,12 @@ func (m model) doneView() string {
 	b.WriteString(m.timelineHeader())
 	lastRule := writeTimelineLines(&b, m.lines)
 	if lastRule != "" {
-		b.WriteString(pipeLine() + "\n")
+		b.WriteString(pipeLine())
+		b.WriteString("\n")
 	}
-	b.WriteString(dimStyle.Render("└  ") + "Done\n")
+	b.WriteString(dimStyle.Render("└  "))
+	b.WriteString("Done")
+	b.WriteString("\n")
 	return b.String()
 }
 
@@ -130,17 +162,33 @@ func (m model) failedView() string {
 	}
 	if failRule != "" && failRule != lastRule {
 		if lastRule != "" {
-			b.WriteString(pipeLine() + "\n")
+			b.WriteString(pipeLine())
+			b.WriteString("\n")
 		}
-		b.WriteString(okStyle.Render("◆") + "  " + failRule + "\n")
+		b.WriteString(okStyle.Render("◆"))
+		b.WriteString("  ")
+		b.WriteString(failRule)
+		b.WriteString("\n")
 	}
 	if m.failedLbl != "" {
-		b.WriteString(pipeLine() + "  " + errStyle.Render("*") + " " + m.failedLbl + " failed\n")
+		b.WriteString(pipeLine())
+		b.WriteString("  ")
+		b.WriteString(errStyle.Render("*"))
+		b.WriteString(" ")
+		b.WriteString(m.failedLbl)
+		b.WriteString(" failed")
+		b.WriteString("\n")
 	}
 	if m.installErr != nil {
-		b.WriteString(pipeLine() + "  " + errStyle.Render(m.installErr.Error()) + "\n")
+		b.WriteString(pipeLine())
+		b.WriteString("  ")
+		b.WriteString(errStyle.Render(m.installErr.Error()))
+		b.WriteString("\n")
 	}
-	b.WriteString(pipeLine() + "\n")
-	b.WriteString(dimStyle.Render("└  ") + "Failed\n")
+	b.WriteString(pipeLine())
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render("└  "))
+	b.WriteString("Failed")
+	b.WriteString("\n")
 	return b.String()
 }

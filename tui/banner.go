@@ -1,12 +1,11 @@
 package tui
 
 import (
-	"math"
 	"strings"
 	"unicode/utf8"
 
 	"charm.land/lipgloss/v2"
-	"github.com/lucasb-eyer/go-colorful"
+	"github.com/mewisme/agentrule/pastel"
 )
 
 const bannerArt = `
@@ -17,12 +16,6 @@ const bannerArt = `
 ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║       ██║  ██║╚██████╔╝███████╗███████╗
 ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
 `
-
-// pastel stops from bokub/gradient-string (HSV long spin).
-var (
-	pastelStart, _ = colorful.Hex("#74ebd5")
-	pastelEnd, _   = colorful.Hex("#74ecd5")
-)
 
 // BannerView returns the styled banner block used by CLI and TUI.
 func BannerView() string {
@@ -57,8 +50,8 @@ func pastelMultiline(s string) string {
 		i := 0
 		for _, r := range line {
 			t := float64(i) / float64(maxLen-1)
-			c := pastelAt(t)
-			b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color(c.Hex())).Render(string(r)))
+			c := pastel.Hex(t)
+			b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color(c)).Render(string(r)))
 			i++
 		}
 		if li < len(lines)-1 {
@@ -66,21 +59,4 @@ func pastelMultiline(s string) string {
 		}
 	}
 	return b.String()
-}
-
-func pastelAt(t float64) colorful.Color {
-	h1, s1, v1 := pastelStart.Hsv()
-	h2, s2, v2 := pastelEnd.Hsv()
-	return colorful.Hsv(hueLerpLong(h1, h2, t), s1+(s2-s1)*t, v1+(v2-v1)*t)
-}
-
-func hueLerpLong(h1, h2, t float64) float64 {
-	d := math.Mod(h2-h1, 360)
-	if d < 0 {
-		d += 360
-	}
-	if d < 180 {
-		d -= 360
-	}
-	return math.Mod(h1+d*t+360, 360)
 }
