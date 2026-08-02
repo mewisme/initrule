@@ -112,6 +112,8 @@ Codex, Hermes, and Antigravity are **global-only** (skipped when `--location=loc
 | `codegraph` | ensure binary → `codegraph install` (MCP) → `codegraph init` → write rule to agents | remove rule from agents → `codegraph uninstall --keep-cli` (leaves `.codegraph/` index and the CLI binary) |
 | `ponytail` | write rule to agents | remove rule from agents |
 | `i-have-adhd` | write rule to agents | remove rule from agents |
+| `git-commit` | write rule to agents | remove rule from agents |
+| `karpathy-guidelines` | write rule to agents | remove rule from agents |
 | `powershell` | write rule to agents (Windows only; hidden on other OS) | remove rule from agents |
 
 ### Where rules land

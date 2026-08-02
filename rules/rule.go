@@ -107,6 +107,12 @@ func All() []Rule {
 			},
 		},
 		{
+			Name: "karpathy-guidelines",
+			Steps: []Step{
+				{Key: "install", Label: "Wrote rule to agent targets", Run: writeRuleWork("karpathy-guidelines")},
+			},
+		},
+		{
 			Name: "ponytail",
 			Steps: []Step{
 				{Key: "install", Label: "Wrote rule to agent targets", Run: writeRuleWork("ponytail")},
