@@ -126,5 +126,5 @@ homebrew_casks:
           end
     repository:
       owner: mewisme
-      name: homebrew-tools
+      name: homebrew-mew
       branch: main
